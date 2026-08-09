@@ -165,6 +165,8 @@ jobs:
             yasm
             nasm
             pkg-config
+            meson
+            ninja
 
       - name: Libraries.
         run: |
