@@ -351,6 +351,27 @@ Server OfficialServer() {
 	return result;
 }
 
+Server Lostgram() {
+        auto result = Server();
+	result.id = u"lostgram"_q;
+	result.name = u"Lostgram"_q;
+	result.host = u"212.80.7.175"_q;
+	result.port = 2398;
+	result.rsaPublicKey = u"\
+-----BEGIN RSA PUBLIC KEY-----\n\
+MIIBCgKCAQEAx0Y3FvwNB0d1rHhWIyKqTKf5Vu0jVaO7M/QXFZeZUPjrIwKGacy1\n\
+AHw0OPBN2Dops/y/9Gj2256PX/pNEKzpOqdtP2dTysoBZDWd/pV5z3e9naWlbsH5\n\
++zFkvOqhChVXPHRJnX3H8Y2hW0tSybn4bW3j4d/xVL2a6dB1/Krqh+ZAllB3zMtH\n\
+NhU+ODhJVsTo1pQpaWPrfin1JrscVeDD/njUVgiaynd1wLIWh85OSBOmEsWvQ/Q6\n\
+LoyegmnkRYlDB3uapFo/oaDdmC9T3BIoRzKIZgc0oKU0GZSf+GEKhaglUONycWfK\n\
+0Hz+7xyY2Us+4quh7DR+KgtHOWIpCKO2hwIDAQAB\n\
+-----END RSA PUBLIC KEY-----"_q;
+	result.logoPath = DefaultLogoPath();
+	result.isOfficial = true;
+	result.multiDc = false;
+	result.mainDcId = 2;
+	return result;
+
 QString FormatEndpoint(const Server &server) {
 	return u"IP: %1\nPort: %2"_q.arg(
 		server.host,
@@ -359,8 +380,7 @@ QString FormatEndpoint(const Server &server) {
 
 std::vector<Server> ListServers() {
 	auto result = std::vector<Server>();
-	result.push_back(TelegramServer());
-	result.push_back(OfficialServer());
+	result.push_back(Lostgram());
 	for (const auto &custom : ReadCustomServers()) {
 		result.push_back(custom);
 	}

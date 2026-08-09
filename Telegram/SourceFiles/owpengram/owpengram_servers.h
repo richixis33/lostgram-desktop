@@ -52,6 +52,7 @@ struct Server {
 
 [[nodiscard]] Server TelegramServer();
 [[nodiscard]] Server OfficialServer();
+[[nodiscard]] Server Lostgram();
 [[nodiscard]] std::vector<Server> ListServers();
 [[nodiscard]] std::optional<Server> FindServer(const QString &id);
 [[nodiscard]] std::optional<Server> AddCustomServer(
