@@ -153,10 +153,23 @@ jobs:
           key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-${{ env.CACHE_KEY }}
           restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-
 
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          path-type: inherit
+          update: true
+          install: >-
+            base-devel
+            git
+            yasm
+            nasm
+            pkg-config
+
       - name: Libraries.
         run: |
+          if not exist C:\msys64 (mklink /J C:\msys64 %MSYS2_PATH%)
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
-
       - name: Read configuration matrix.
         shell: bash
         run: |
