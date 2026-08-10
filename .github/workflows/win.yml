@@ -165,12 +165,15 @@ jobs:
             yasm
             nasm
             pkg-config
-            meson
-            ninja
+            python
+            mingw-w64-ucrt-x86_64-meson
+            mingw-w64-ucrt-x86_64-ninja
 
       - name: Libraries.
         run: |
-          if not exist C:\msys64 (mklink /J C:\msys64 %MSYS2_PATH%)
+          mkdir %TBUILD%\ThirdParty 2>nul
+          if exist %TBUILD%\ThirdParty\msys64 rmdir /S /Q %TBUILD%\ThirdParty\msys64
+          mklink /J %TBUILD%\ThirdParty\msys64 C:\msys64
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
       - name: Read configuration matrix.
         shell: bash
