@@ -455,7 +455,7 @@ if customRunCommand:
 stage('patches', """
     git clone https://github.com/desktop-app/patches.git
     cd patches
-    git checkout 507b9f8f8facaf33dbd377a74c277c87f1048fe5
+    git checkout a17d54b63128c83cb53bd71044119e77b3a2da02
 mac:
     git clone https://github.com/desktop-app/qt6_highsierra_patches.git qt6_highsierra
     cd qt6_highsierra
@@ -743,7 +743,7 @@ win:
 
 # Somehow in x86 Debug build dav1d crashes on AV1 10bpc videos.
 stage('dav1d', """
-    git clone -b 1.5.3 https://code.videolan.org/videolan/dav1d.git
+    git clone -b 1.5.4 https://code.videolan.org/videolan/dav1d.git
     cd dav1d
 win32:
     SET "TARGET=x86"
@@ -866,7 +866,7 @@ mac:
 """)
 
 stage('libavif', """
-    git clone -b v1.3.0 https://github.com/AOMediaCodec/libavif.git
+    git clone -b v1.4.2 https://github.com/AOMediaCodec/libavif.git
     cd libavif
 win:
     cmake . ^
@@ -895,7 +895,7 @@ mac:
 """)
 
 stage('libde265', """
-    git clone -b v1.0.16 https://github.com/strukturag/libde265.git
+    git clone -b v1.1.1 https://github.com/strukturag/libde265.git
     cd libde265
 win:
     cmake . ^
@@ -930,8 +930,8 @@ stage('libwebp', """
     git clone -b v1.6.0 https://github.com/webmproject/libwebp.git
     cd libwebp
 win:
-    nmake /f Makefile.vc ARCH=$X8664 CFG=debug-static OBJDIR=out RTLIBCFG=static all
-    nmake /f Makefile.vc ARCH=$X8664 CFG=release-static OBJDIR=out RTLIBCFG=static all
+    nmake /f Makefile.vc CFG=debug-static OBJDIR=out RTLIBCFG=static all
+    nmake /f Makefile.vc CFG=release-static OBJDIR=out RTLIBCFG=static all
     copy out\\release-static\\$X8664\\lib\\libwebp.lib out\\release-static\\$X8664\\lib\\webp.lib
     copy out\\release-static\\$X8664\\lib\\libwebpdemux.lib out\\release-static\\$X8664\\lib\\webpdemux.lib
     copy out\\release-static\\$X8664\\lib\\libwebpmux.lib out\\release-static\\$X8664\\lib\\webpmux.lib
@@ -966,7 +966,7 @@ mac:
 """)
 
 stage('libheif', """
-    git clone -b v1.21.2 https://github.com/strukturag/libheif.git
+    git clone -b v1.23.1 https://github.com/strukturag/libheif.git
     cd libheif
 win:
     %THIRDPARTY_DIR%\\msys64\\usr\\bin\\sed.exe -i 's/LIBHEIF_EXPORTS/LIBDE265_STATIC_BUILD/g' libheif/CMakeLists.txt
@@ -977,7 +977,7 @@ win:
         -DCMAKE_INSTALL_PREFIX=%LIBS_DIR%/local ^
         -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded$<$<CONFIG:Debug>:Debug>" ^
         -DBUILD_SHARED_LIBS=OFF ^
-        -DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON ^
+        -DBUILD_DOCUMENTATION=OFF ^
         -DBUILD_TESTING=OFF ^
         -DENABLE_PLUGIN_LOADING=OFF ^
         -DWITH_LIBDE265=ON ^
@@ -1002,7 +1002,7 @@ mac:
         -D CMAKE_OSX_ARCHITECTURES="x86_64;arm64" \\
         -D CMAKE_INSTALL_PREFIX:STRING=$USED_PREFIX \\
         -D BUILD_SHARED_LIBS=OFF \\
-        -D CMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON \\
+        -D BUILD_DOCUMENTATION=OFF \\
         -D BUILD_TESTING=OFF \\
         -D ENABLE_PLUGIN_LOADING=OFF \\
         -D WITH_AOM_ENCODER=OFF \\
@@ -1026,7 +1026,7 @@ mac:
 """)
 
 stage('libjxl', """
-    git clone -b v0.11.2 --recursive --shallow-submodules https://github.com/libjxl/libjxl.git
+    git clone -b v0.12.0 --recursive --shallow-submodules https://github.com/libjxl/libjxl.git
     cd libjxl
 """ + setVar("cmake_defines", """
     -DBUILD_SHARED_LIBS=OFF
@@ -1038,7 +1038,6 @@ stage('libjxl', """
     -DJPEGXL_ENABLE_MANPAGES=OFF
     -DJPEGXL_ENABLE_EXAMPLES=OFF
     -DJPEGXL_ENABLE_JNI=OFF
-    -DJPEGXL_ENABLE_JPEGLI_LIBJPEG=OFF
     -DJPEGXL_ENABLE_SJPEG=OFF
     -DJPEGXL_ENABLE_OPENEXR=OFF
     -DJPEGXL_ENABLE_SKCMS=ON
@@ -1077,7 +1076,6 @@ depends:patches/libvpx/*.patch
 win:
     for /r %%i in (..\\patches\\libvpx\\*) do git apply %%i
 
-    if not "%VCToolsInstallDir%"=="" set "PATH=%VCToolsInstallDir%\\bin\\Hostx64\\x64;%PATH%"
     SET PATH=%THIRDPARTY_DIR%\\msys64\\usr\\bin;%PATH%
     SET CHERE_INVOKING=enabled_from_arguments
     SET MSYS2_PATH_TYPE=inherit
@@ -1090,7 +1088,7 @@ winarm:
     SET "TOOLCHAIN=arm64-win64-vs17-v145"
 win:
 depends:patches/build_libvpx_win.sh
-    bash ../patches/build_libvpx_win.sh
+    bash --login ../patches/build_libvpx_win.sh
 mac:
     find ../patches/libvpx -type f -print0 | sort -z | xargs -0 git apply
 
@@ -1176,13 +1174,12 @@ stage('regex', """
 """)
 
 stage('ffmpeg', """
-    git clone -b n6.1.1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
+    git clone -b n6.1.6 https://github.com/FFmpeg/FFmpeg.git ffmpeg
     cd ffmpeg
 win:
 depends:patches/ffmpeg.patch
     git apply ../patches/ffmpeg.patch
 
-    if not "%VCToolsInstallDir%"=="" set "PATH=%VCToolsInstallDir%\\bin\\Hostx64\\x64;%PATH%"
     SET PATH=%THIRDPARTY_DIR%\\msys64\\usr\\bin;%PATH%
     SET CHERE_INVOKING=enabled_from_arguments
     SET MSYS2_PATH_TYPE=inherit
@@ -1192,7 +1189,7 @@ winarm:
     SET "ARCH_PARAM=--arch=aarch64"
 win:
 depends:patches/build_ffmpeg_win.sh
-    bash ../patches/build_ffmpeg_win.sh
+    bash --login ../patches/build_ffmpeg_win.sh
 mac:
     export PKG_CONFIG_PATH=$USED_PREFIX/lib/pkgconfig
 
