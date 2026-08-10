@@ -153,39 +153,9 @@ jobs:
           key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-${{ env.CACHE_KEY }}
           restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-
 
-      - name: Setup MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          path-type: inherit
-          update: true
-          install: >-
-            base-devel
-            git
-            yasm
-            nasm
-            pkg-config
-            python
-            mingw-w64-ucrt-x86_64-meson
-            mingw-w64-ucrt-x86_64-ninja
-
-      - name: Fix MSYS2 link.exe collision
-        shell: cmd
-        run: |
-          mkdir %TBUILD%\ThirdParty 2>nul
-          if exist %TBUILD%\ThirdParty\msys64 rmdir /S /Q %TBUILD%\ThirdParty\msys64
-          mklink /J %TBUILD%\ThirdParty\msys64 C:\msys64
-          if exist C:\msys64\usr\bin\link.exe move /Y C:\msys64\usr\bin\link.exe C:\msys64\usr\bin\link.exe.bak
-
       - name: Libraries.
         run: |
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
-
-      - name: Print FFmpeg log on failure
-        if: failure()
-        shell: bash
-        run: |
-          find $TBUILD -name "config.log" -exec echo "=== {} ===" \; -exec tail -n 100 {} \;
       - name: Read configuration matrix.
         shell: bash
         run: |
