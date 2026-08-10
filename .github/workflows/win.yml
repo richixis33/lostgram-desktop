@@ -153,6 +153,11 @@ jobs:
           key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-${{ env.CACHE_KEY }}
           restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-
 
+      - name: Fix MSYS2 link.exe collision
+        shell: cmd
+        run: |
+          if exist C:\msys64\usr\bin\link.exe move /Y C:\msys64\usr\bin\link.exe C:\msys64\usr\bin\link.exe.bak
+
       - name: Libraries.
         run: |
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
